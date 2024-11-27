@@ -4,6 +4,9 @@ from user.domain.user import User
 from user.domain.repository.user_repo import IUserRepository
 from user.infra.repository.user_repo import UserReopsitory
 
+from fastapi import HTTPException
+
+# 유저 저장 및 중복 유저 검사 
 class UserService:
     def __init__(self):
         # 유저를 데이터베이스에 저장하는 저장소는 인프라 계층에 구현체가 있어야 한다. 
@@ -15,14 +18,30 @@ class UserService:
         self.ulid = ULID()
 
     def create_user(self, name: str, email: str, password: str):
+        _user = None
+
+        try:
+            _user = self.user_repo.find_by_email(email)
+
+        except HTTPException as e:
+            if e.status_code != 422:
+                raise e
+        
+        # 같은 이메일로 가입된 유저가 있다면, 인프라 계층에서 422 에러를 일으킴
+        if _user:
+            raise HTTPException(status_code=422)
+
         now = datetime.now()
         user: User = User(  # 도메인 객체 생성 
             id=self.ulid.generate(),
             name=nmae,
             email=email,
-            password=password,
+            password=self.crypto.encrypt(password),  # 유저를 생성할 때 패스워드를 암호화해서 저장한다. 
             created_at=now,
             updated_at=now,
         )
-        self.user_repo.save(user)  # 생성된 객체를 저장소로 전달해 저장 
+        self.user_repo.save(user)  # 생성된 객체를 저장소로 전달해 저장
+
+        return user 
+
 
