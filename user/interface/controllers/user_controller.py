@@ -1,8 +1,8 @@
-from fastapi import APIRouter
-
-# 파이단틱: 데이터 유효성 검사 & 직렬화/역직렬화를 위한 라이브러리 
-# 파이썬의 타입 힌트 기능을 이용해 유효성을 검증 / 데이터 모델에서 JSON 스키마를 자동으로 생성할 수 있음(OpenAPI 스펙 작성 시 유용)
+from fastapi import APIRouter, Depends
+from typing import Annotated
 from pydantic import BaseModel 
+from containers import Container
+from dependency_injector.wiring import inject, Provide
 
 from user.application.user_service import UserService
 
@@ -21,8 +21,17 @@ class CreateUserBody(BaseModel):
 
 # API의 진입점을 나타내는 라우터 함수: (경로 수행 함수, 엔드포인트 함수, 라우터 함수)라고 함
 @router.post("", status_code=201)   
-def create_user(user: CreateUserBody):  # 유저 생성 유스 케이스 호출 / 인터페이스 계층은 애플리케이션 계층에 의존해도 된다. 
-    user_service = UserService()
+@inject 
+# 유저 생성 유스 케이스 호출 / 인터페이스 계층은 애플리케이션 계층에 의존해도 된다. 
+def create_user(
+    user: CreateUserBody,
+    user_service: UserService = Depends(Provide[Container.user_service]),  # dependency_injector로 주입 받음
+    # user_service: UserService = Depends(Provide["user_service"]), 
+    # 리터럴 문자열로도 가능 -> 컨테이너에 등록된 모듈이 서로를 주입해야 하는 경우 순환 참조가 발생하기 때문이다. 
+    # 그러나 실질적으로는 안 사라짐 (빌드 에러만 해결함) SW 구조적으로 좋지 않다. 
+    # 실질적 해결 방안: 순환 참조가 일어나는 부분을 다른 모듈로 분리하고, 해당 모듈을 함께 사용하는 것이 좋다. 
+):
+    # user_service = UserService()
     created_user = user_service.create_user(
         name=user.name,
         email=user.email,

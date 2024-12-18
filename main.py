@@ -6,7 +6,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
+from containers import Container
+
 app = FastAPI()
+app.container = Container()
 app.include_router(user_routers)
 
 # FastAPI는 400 에러를 422 에러로 처리함 -> 400 에러로 처리하는 방법 
