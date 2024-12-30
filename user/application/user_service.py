@@ -6,9 +6,17 @@ from user.infra.repository.user_repo import UserReopsitory
 
 from fastapi import HTTPException
 
+from dependency_injector.wiring import inject, Provide
+from fastapi import Depends
+from containers import Container
+
 # 유저 저장 및 중복 유저 검사 
 class UserService:
-    def __init__(self):
+    @inject  # 의존성 객체를 사용하는 함수에 주입받은 객체를 사용한다고 명시 
+    def __init__(
+        self,
+        user_repo: IUserRepository,
+        ):
         # 유저를 데이터베이스에 저장하는 저장소는 인프라 계층에 구현체가 있어야 한다. 
         # -> 외부의 서비스를 다루는 모듈은 그 수준이 낮기 때문이다. (데이터를 저장하기 위해 IUserRepository 사용 - 의존성 역전되어있음)
         self.user_repo: IUserRepository = UserRepository()
