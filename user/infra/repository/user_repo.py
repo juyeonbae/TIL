@@ -18,7 +18,7 @@ class UserRepository(IUserRepository):
         )
         
         # 세션 객체를 생성해서 사용할 때 세션이 자동으로 닫히도록 한다. (데베에 에러가 발생했을 때 세션이 제대로 안 닫힐 수 있기 때문)
-        with SessionalLocal() as db:
+        with SessionLocal() as db:
             try:
                 db = SessionLocal()
                 db.add(new_user)
@@ -27,10 +27,59 @@ class UserRepository(IUserRepository):
                 db.close()
             
     def find_by_email(self, email:str) -> UserVO:
-        with SesionLocal() as db:
+        with SessionLocal() as db:
             user = db.query(User).filter(User.email == email).first()
             
         if not user:
             raise HTTPException(status_code=422)
         
         return UserVO(**row_to_dict(user))
+    
+    def find_by_id(self, id: str):
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.id == id).first()
+
+        if not user:
+            raise HTTPException(status_code=422)
+        
+        return UserVO(**row_to_dict(user))
+    
+    def update(self, user_vo: UserVO):
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.id == user_vo.id).first()
+
+            if not user:
+                raise HTTPException(status_code=422)
+            
+            user.name = user_vo.name
+            user.password = user_vo.password
+
+            db.add(user)
+            db.commit()
+
+        return user
+    
+    def get_users(
+            self,
+            page: int = 1,
+            items_per_page: int = 10,
+            ) -> tuple[int, list[UserVO]]:
+        with SessionLocal() as db:
+            query = db.query(User)
+            total_count = query.count()
+            
+            offset = (page - 1) * items_per_page
+            users = query.limit(items_per_page).offset(offset).all()
+            
+        return total_count, [UserVO(**row_to_dict(user)) for user in users]
+    
+
+    def delete(self, id: str):
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.id == id).first()
+            
+            if not user:
+                raise HTTPException(status_code=422)
+            
+            db.delete(user)
+            db.commit()

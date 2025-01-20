@@ -1,16 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-@dataclass  # 도메인 객체를 다루기 쉽도록 하기 위해 
-class Profile:  # 값 객체: 데이터만 갖고 있는 도메인 객체
-    name: str
-    email: str
-
 @dataclass
 class User:
     id: str  # 리소스 구분자 
-    profile: Profile
+    name: str
+    email: str
     password: str
+    memo: str | None  # 시스템 관리자가 유저에 대한 정보를 남기고 싶을 때 메모 
     created_at: datetime
     updated_at: datetime
 

@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from user.domain.user import User
 
 # 파이썬에서 제공하는 객체지향 인터페이스로 선언하기 위해 ABCMeta 클래스 이용
@@ -15,5 +15,19 @@ class IUserRepository(metaclass=ABCMeta):
         (422 Error: 서버가 요청한 엔티티의 구문을 제대로 해석했지만, 명령을 수행할 수 없다는 뜻) 
         """
         raise NotImplementedError
+    
+    @abstractmethod
+    def find_by_id(self, id: str) -> User:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def update(self, user: User):
+        raise NotImplementedError
 
-
+    @abstractmethod
+    def get_users(self, page: int, items_per_page: int) -> tuple[int, list[User]]:  # 함수 반환값 명시 -> mypy 같은 정적 분석기가 오류 검사시 도움됨
+        raise NotImplementedError
+    
+    @abstractmethod
+    def delete(self, id: str):
+        raise NotImplementedError
