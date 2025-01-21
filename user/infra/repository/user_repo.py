@@ -15,6 +15,8 @@ class UserRepository(IUserRepository):
             password=user.password,
             created_at=user.created_at,
             updated_at=user.updated_at,
+            role=user.role,
+            memo=user.memo
         )
         
         # 세션 객체를 생성해서 사용할 때 세션이 자동으로 닫히도록 한다. (데베에 에러가 발생했을 때 세션이 제대로 안 닫힐 수 있기 때문)

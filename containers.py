@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 from user.infra.repository.user_repo import UserRepository
 from user.application.user_service import UserService
+from utils.crypto import Crypto
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
@@ -9,6 +10,7 @@ class Container(containers.DeclarativeContainer):
         # 특정 모듈에만 제공하고 싶다면 modules=["user.application.user_service"]와 같이 등록할 수 있다. 
     )
     
+    crypto = providers.Factory(Crypto)  # Crypto 서비스 등록
     user_repo = providers.Factory(UserRepository)  # 의존성을 제공할 모듈을 팩토리에 등록한다. 
-    user_service = providers.Factory(UserService, user_repo=user_repo)
+    user_service = providers.Factory(UserService, user_repo=user_repo, crypto=crypto)
     

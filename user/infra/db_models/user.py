@@ -1,7 +1,9 @@
 from datetime import datetime
-from sqlalchemy import String, DateTime, Text
+from sqlalchemy import String, DateTime, Text, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
+from common.auth import Role
+
 
 # datebase 모듈에서 declarative_base 함수에 의해 생성된 Base 클래스를 상속 받는다. 
 # declarative_base 함수: 선언형 클래스를 정의하기 위한 기본 클래스 생성
@@ -15,6 +17,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(32), nullable=False)
     email: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)  # unique: 유일한 값
     password: Mapped[str] = mapped_column(String(64), nullable=False)
+    role: Mapped[Role] = mapped_column(Enum(Role), nullable=False, default=Role.USER, server_default=Role.USER.value)  # Role 컬럼 추가
     memo: Mapped[str] = mapped_column(Text, nullable=True)  # 메모는 없을 수도 있으므로 Null 허용 
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

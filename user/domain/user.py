@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from common.auth import Role
 
 @dataclass
 class User:
@@ -10,5 +11,5 @@ class User:
     memo: str | None  # 시스템 관리자가 유저에 대한 정보를 남기고 싶을 때 메모 
     created_at: datetime
     updated_at: datetime
-
+    role: Role
 
