@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import BackgroundTasks, APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from pydantic import BaseModel, EmailStr, Field 
@@ -45,6 +45,7 @@ class GetUserResponse(BaseModel):
 # 유저 생성 유스 케이스 호출 / 인터페이스 계층은 애플리케이션 계층에 의존해도 된다. 
 def create_user(
     user: CreateUserBody,
+    # background_tasks: BackgroundTasks,
     user_service: UserService = Depends(Provide[Container.user_service]),  # dependency_injector로 주입 받음
     # user_service: UserService = Depends(Provide["user_service"]), 
     # 리터럴 문자열로도 가능 -> 컨테이너에 등록된 모듈이 서로를 주입해야 하는 경우 순환 참조가 발생하기 때문이다. 
@@ -53,6 +54,7 @@ def create_user(
 ):
     # user_service = UserService()
     created_user = user_service.create_user(
+        # background_tasks=background_tasks,
         name=user.name,
         email=user.email,
         password=user.password
