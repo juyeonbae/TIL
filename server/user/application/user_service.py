@@ -24,17 +24,21 @@ class UserService:
     def __init__(
         self,
         user_repo: IUserRepository,
+        ulid: ULID,
         crypto: Crypto,
         email_service: EmailService,
+        send_welcome_email_task: SendWelcomeEmailTask,
     ):
         # 유저를 데이터베이스에 저장하는 저장소는 인프라 계층에 구현체가 있어야 한다. 
         # -> 외부의 서비스를 다루는 모듈은 그 수준이 낮기 때문이다. (데이터를 저장하기 위해 IUserRepository 사용 - 의존성 역전되어있음)
         self.user_repo = user_repo # IUserRepository = IUserRepository()
         self.email_service = email_service
-        self.crypto = crypto
+        
         # user_repo는 IUserRepository로 선언했지만, 실제 할당되는 객체는 UserRepository의 객체이다. 
         # 애플리케이션 계층이 인프라 계층에 직접 의존하고 있다. (클린 아키텍처의 대전제 위반) -> 이후 문제 해결 예정 
-        self.ulid = ULID()
+        self.ulid = ulid
+        self.crypto = crypto
+        self.send_welcome_email_task = send_welcome_email_task
 
     def create_user(
             self, 
@@ -73,7 +77,7 @@ class UserService:
         self.user_repo.save(user)  # 생성된 객체를 저장소로 전달해 저장
 
         # background_tasks.add_task(self.email_service.send_email, user.email)
-        SendWelcomeEmailTask().run(user.email)
+        self.send_welcome_email_task.delay(user.email)
 
         # Celery task로 실행
         # task = SendWelcomeEmailTask().delay(user.email)

@@ -24,6 +24,8 @@ python-dotenv = "^1.0.1"
 pydantic-settings = "^2.7.1"
 celery = "^5.4.0"
 eventlet = "^0.38.2"
+pytest-mock = "^3.14.0"
+freezegun = "^1.5.1"
 
 
 [build-system]

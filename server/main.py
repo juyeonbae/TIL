@@ -8,10 +8,13 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
 from containers import Container
+from middlewares import create_middlewares
 
 app = FastAPI()
 app.container = Container()
 app.container.wire(modules=["user.interface.controllers.user_controller"])  # 추가된 부분
+
+create_middlewares(app)
 
 app.include_router(user_routers)
 app.include_router(note_routers)

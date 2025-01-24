@@ -13,7 +13,7 @@ from common.auth import Role
 user_repo = UserRepository()
 
 # ID로 사용자 삭제
-user_repo.delete("ID")
+user_repo.delete("01JJ8W1EA4P87S29BFX45TVR8B")
 
 '''
 # 필요한 의존성 객체들 생성
